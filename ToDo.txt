@@ -10,7 +10,6 @@ Pendientes:
 		Check if paths exists
 
 	preprocessing
-		Grouping by frequency
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication
 		Generate output sliced by journal
@@ -18,3 +17,16 @@ Pendientes:
 
 	term-frequency-visualizer
 		Plot linealización curva: y = a * (x^b)  =>  log(y) = log(a) + (b * log(x))
+
+	fca
+		coron
+			generate formal contexts to coron
+			generate lattice from coron
+		sephirot
+			generate formal contexts to sephirot tool
+			generate lattice from sephirot tool
+
+
+	fca visualizer
+		[optional] lattice visualizer from sephirot output
+		[optional] lattice visualizer from coron output
