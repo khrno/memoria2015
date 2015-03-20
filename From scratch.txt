@@ -1,0 +1,17 @@
+1. Download the dataset with the command:
+
+	curl -O http://dblp.uni-trier.de/xml/dblp.xml.gz
+
+2. Put the downloaded dataset into dblpdataset folder
+
+	mv dblp.xml.gz dbldataset/
+
+3. Uncompress dataset
+
+	tar -xzvf dblp.xml.gz
+
+4. Generate the csv dataset with the command inside of data-crawler/examples.sh
+
+5. Generate the csv tokens frequency with the command inside of preprocessing/example.sh
+
+6. Visualize term-frequency charts in:

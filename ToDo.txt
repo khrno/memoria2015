@@ -1,0 +1,19 @@
+Pendientes:
+	general:
+		Installation instructions on Readme.md
+
+	data-crawler
+		Generate output sliced by time lapse
+		Generate output sliced by type of publication
+		Generate output sliced by journal
+		Check if paths exists
+
+	preprocessing
+		Configure server khrno.cl to stablish public url to visualize term frequencies charts
+		Grouping by frequency
+		Build histogram vizualizer
+		Filter by tag (Treetagger)
+		Generate output sliced by time lapse
+		Generate output sliced by type of publication
+		Generate output sliced by journal
+		Check if paths exists

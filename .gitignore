@@ -6,6 +6,10 @@ dblpdataset/*.gz
 dblpdataset/current_version
 dblpdataset/v*
 
+#Codekit
+*config.codekit
+
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
