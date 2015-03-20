@@ -1,0 +1,16 @@
+Pendientes:
+
+	data-crawler
+		Generate output sliced by time lapse
+		Generate output sliced by type of publication
+		Generate output sliced by journal
+		Check if paths exists
+
+	preprocessing
+		Grouping by frequency
+		Build histogram vizualizer
+		Filter by tag (Treetagger)
+		Generate output sliced by time lapse
+		Generate output sliced by type of publication
+		Generate output sliced by journal
+		Check if paths exists
