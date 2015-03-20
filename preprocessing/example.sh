@@ -1,0 +1,1 @@
+python Preprocessor.py --verbose -i ../dblpdataset/current_version/minimal/DBLP.min10000.csv  -o ../dblpdataset/current_version/minimal --stemPorter --fthreshold 0
