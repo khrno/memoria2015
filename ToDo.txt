@@ -1,7 +1,8 @@
 Pendientes:
-	general:
-		Installation instructions on Readme.md
-
+	general
+		Instructions to install and use from scratch
+		Script firstUse.sh
+		
 	data-crawler
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication
@@ -9,11 +10,11 @@ Pendientes:
 		Check if paths exists
 
 	preprocessing
-		Configure server khrno.cl to stablish public url to visualize term frequencies charts
 		Grouping by frequency
-		Build histogram vizualizer
-		Filter by tag (Treetagger)
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication
 		Generate output sliced by journal
 		Check if paths exists
+
+	term-frequency-visualizer
+		Plot linealización curva: y = a * (x^b)  =>  log(y) = log(a) + (b * log(x))
