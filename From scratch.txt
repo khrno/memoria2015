@@ -8,12 +8,18 @@
 
 3. Uncompress dataset
 
-	tar -xzvf dblp.xml.gz
+	gzip -d dblp.xml.gz
+
+5. Installing libraries to use
+	
+	sudo pip install -r preprocessing/requirements.txt
 
 4. Generate symbolic links in dblpdataset
 
 	mkdir dblpdataset/v<N> 								#Donde N es el número de version
+	
 	ln -s dblpdataset/v<N> dblpdataset/current_version	#Donde N es el número de verison
+	
 	mkdir dblpdataset/current_version/minimal
 
 4. Generate the csv dataset with the command inside of data-crawler/example.sh
@@ -21,7 +27,10 @@
 5. Minizming dataset
 
 	(head -10001 dblpdataset/current_version/DBLP.csv) > dblpdataset/current_version/minimal/DBLP.min10000.csv
-	python data-crawler/generateMinimalMapping.py -d dblpdataset/current_version/minimal/DBLP.min10000.csv -m dblpdataset/current_version/MapIdsToDBLP.csv -o dblpdataset/current_version/minimal/MapIdsToDBLP.min10000.csv --verbose
+	
+	python data-crawler/generateMinimalMapping.py -d dblpdataset/current_version/minimal/DBLP.min10000.csv -m dblpdataset/current_version/MapIdsToDBLP.csv -o 
+	
+	dblpdataset/current_version/minimal/MapIdsToDBLP.min10000.csv --verbose
 
 5. Generate the csv tokens frequency with the command inside of preprocessing/example.sh
 
