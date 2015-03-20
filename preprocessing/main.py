@@ -12,7 +12,8 @@ if ( __name__ == "__main__"):
 	counter = False
 	stemAlgorithm = None
 	fthreshold = 100
-	options, remainder = getopt.getopt(sys.argv[1:], 'i:o:p:cvh',['input=','output=','partition=','stemPorter','stemLancaster','stemSnowball','fthreshold=','counter','verbose','help'])
+	pos_tag_to_filter = None
+	options, remainder = getopt.getopt(sys.argv[1:], 'i:o:p:t:cvh',['input=','output=','partition=','pos_tag=','stemPorter','stemLancaster','stemSnowball','fthreshold=','counter','verbose','help'])
 	for opt,arg in options:
 		if opt in ('-i', '--input'):
 			inputFilename = arg
@@ -32,6 +33,9 @@ if ( __name__ == "__main__"):
 		elif opt in ('--stemSnowball'):
 			stemAlgorithm = "Snowball"
 
+		elif opt in ('-t', '--pos_tag'):
+			pos_tag_to_filter = arg
+
 		elif opt in('--fthreshold'):
 			fthreshold = int(arg)
 			
@@ -48,6 +52,7 @@ if ( __name__ == "__main__"):
 			print "\t-o or --output <output_filename>: optional"
 			print "\t--stemPorter or --stemLancaster --stemSnowball: optional"
 			print "\t--fthreshold <frecuency_threshold>: optional"
+			print "\t-t or --pos_tag <tag_to_filter>: optional"
 			print "\t-p or --partition <partition type>: optional"
 			print "\t-c or --counter output: optional"
 			print "\t-v or --verbose: optional"
@@ -55,10 +60,10 @@ if ( __name__ == "__main__"):
 			sys.exit()
 
 	starTime = time.time()
-	preprocessor = Preprocessor(inputFilename, outputPath, verbose, partition, counter, stemAlgorithm)
+	preprocessor = Preprocessor(inputFilename, outputPath, verbose, partition, counter, stemAlgorithm, pos_tag_to_filter)
 	
 	preprocessor.execute()
-	preprocessor.exportTokenFrequency('token_frequency.csv', fthreshold)
-
+	preprocessor.exportTokenFrequency(fthreshold)
+	preprocessor.exportTokensOrdered()
 	print "\t... execution total time:",int(time.time() - starTime),"seconds"
 	print "[DONE]"

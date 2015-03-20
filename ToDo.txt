@@ -11,9 +11,10 @@ Pendientes:
 
 	preprocessing
 		Grouping by frequency
-		Build histogram vizualizer
-		Filter by tag (Treetagger)
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication
 		Generate output sliced by journal
 		Check if paths exists
+
+	term-frequency-visualizer
+		Plot linealización curva: y = a * (x^b)  =>  log(y) = log(a) + (b * log(x))
