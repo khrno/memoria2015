@@ -1,5 +1,8 @@
 Pendientes:
-
+	general
+		Instructions to install and use from scratch
+		Script firstUse.sh
+		
 	data-crawler
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication

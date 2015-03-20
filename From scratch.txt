@@ -12,7 +12,7 @@
 
 5. Installing libraries to use
 	
-	sudo pip install -r data-crawler.requirements.txt
+	sudo pip install -r data-crawler/requirements.txt
 	sudo pip install -r preprocessing/requirements.txt
 
 4. Generate symbolic links in dblpdataset and preprocessing
