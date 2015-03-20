@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>Term Frequencies</title>
+
+	<!-- Bootstrap core CSS -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- Custom styles for this template -->
+	<link href="bootstrap/css/starter-template.css" rel="stylesheet">
+</head>
+
+<body>
+
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Memoria 2015</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="/">Term Frequency</a></li>
+					<li class="active"><a href="">Histogram</a></li>
+				</ul>
+				<ul id="navbar-dataset" class="nav navbar-nav pull-right">
+					<li><a href="data/minimal/token_frequency.csv" target="_blank">Dataset</a></li>
+				</ul>
+			</div><!--/.nav-collapse -->
+		</div>
+	</nav>
+
+	<div class="container">
+
+		<div class="starter-template">
+			<h1>Terms group by frequency</h1>
+
+			<p class="lead">Preprocessor - Analysis of the frequency terms</p>
+			<!-- <div class="col-sm-12 col-md-12 col-lg-10 col-lg-offset-1">
+				<div class="alert alert-info">info</div>
+			</div> -->
+			<div id="chart">
+			</div>
+
+		</div>
+
+	</div><!-- /.container -->
+
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/data.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<script>
+		$(function () {
+			var xcategories = [];
+			$.get('data/minimal/token_frequency.csv', function(csv) {
+				$.each(csv.split("\n"),function(k,v){
+					if (k > 0){
+						token = v.split(",")[0];
+						xcategories.push(token);
+					}
+				});
+			    $('#chart').highcharts({
+			        chart: {
+			            type: 'scatter',
+			            zoomType: 'x'
+			        },
+			        data: {
+			            csv: csv
+			        },
+			        title: {
+			            text: 'Token Frequency'
+			        },
+			        yAxis: {
+			            title: {
+			                text: 'Ocurrences'
+			            }
+			        },
+			        xAxis: {
+			        	categories: xcategories 
+			        },
+			        tooltip: {
+			        	formatter:function(){
+			        		return 'Token: <strong>' + this.x + '</strong><br>Frequency: '+this.y;
+			        	}
+			        }
+			    });
+			}).fail(function (jqXHR, textStatus, error) {
+				$("#navbar-dataset").hide();
+				if ( error == "Not Found")
+					$("#chart").html("<div class='alert alert-danger'>Missing file dataset !</div>");
+				else
+					console.log("Post error: " + error);
+			});
+		});
+	</script>
+</body>
+</html>
