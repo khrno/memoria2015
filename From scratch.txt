@@ -12,15 +12,23 @@
 
 5. Installing libraries to use
 	
+	sudo pip install -r data-crawler.requirements.txt
 	sudo pip install -r preprocessing/requirements.txt
 
-4. Generate symbolic links in dblpdataset
+4. Generate symbolic links in dblpdataset and preprocessing
 
-	mkdir dblpdataset/v<N> 								#Donde N es el número de version
+	cd dblpdataset
+
+	mkdir v<N> 								#Donde N es el número de version
 	
-	ln -s dblpdataset/v<N> dblpdataset/current_version	#Donde N es el número de verison
+	ln -s v<N> current_version	#Donde N es el número de verison
 	
-	mkdir dblpdataset/current_version/minimal
+	mkdir current_version/minimal
+
+	cd ../preprocessing/Pablo:PlotTokenFrecuencies
+
+	ln -s ../../dblpdataset/current_version/ data
+
 
 4. Generate the csv dataset with the command inside of data-crawler/example.sh
 
@@ -34,4 +42,4 @@
 
 5. Generate the csv tokens frequency with the command inside of preprocessing/example.sh
 
-6. Visualize term-frequency charts in:
+6. Visualize term-frequency charts in: http://khrno.cl/Plot
