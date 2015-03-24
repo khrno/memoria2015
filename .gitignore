@@ -1,20 +1,25 @@
-# Datasets
 # DBLP
-dblpdataset/*.csv
 dblpdataset/*.xml
 dblpdataset/*.gz
 dblpdataset/current_version
 dblpdataset/v*
 
+#FCA-Tool
+fca-tool/coron_contexts/*
+fca-tool/data/*
+fca-tool/lattices/*
+fca-tool/visualizer/d3data/*
+
 #Codekit
 *config.codekit
 
-
+#PyCharm
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
 
+*.py[cod]
 # C extensions
 *.so
 
@@ -59,7 +64,6 @@ coverage.xml
 
 # Django stuff:
 *.log
-
 # Sphinx documentation
 docs/_build/
 

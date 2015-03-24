@@ -67,7 +67,7 @@
 	<script>
 		$(function () {
 			var xcategories = [];
-			$.get('data/minimal/token_frequency.csv', function(csv) {
+			$.get('data/token_frequency.csv', function(csv) {
 				$.each(csv.split("\n"),function(k,v){
 					if (k > 0){
 						token = v.split(",")[0];
