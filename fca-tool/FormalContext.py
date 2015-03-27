@@ -3,6 +3,7 @@
 import time
 import csv
 import codecs
+import random
 import numpy as np
 
 
@@ -37,8 +38,14 @@ class FormalContext:
             for row in rows:
                 self.objects.append(row['title '])
                 if row['title '] in self.objectsLabel.keys():
-                    self.objectsLabel[row['title '] + "-2"] = row['internal_id']
-                self.objectsLabel[row['title ']] = row['internal_id']
+                    discriminatoryindex = 1
+                    nt = row['title ']+'-'+str(discriminatoryindex)
+                    while nt in self.objectsLabel.keys():
+                        discriminatoryindex += 1
+                        nt = row['title ']+'-'+str(discriminatoryindex)
+                    self.objectsLabel[row['title '] + "-" + str(discriminatoryindex)] = row['internal_id']
+                else:
+                    self.objectsLabel[row['title ']] = row['internal_id']
 
         if self.verbose:
             print "\t... load %d documents from %s in %d seconds" % (len(self.objects), self.objectsFilename, int(time.time() - startTime))

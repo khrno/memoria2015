@@ -7,9 +7,9 @@ import time
 import codecs
 
 
-options, remainder = getopt.getopt(sys.argv[1:], 'd:m:o:v',['dataset=','mapping=','output=','verbose','help'])
+options, remainder = getopt.getopt(sys.argv[1:], 'd:m:o:v', ['dataset=', 'mapping=', 'output=', 'verbose', 'help'])
 verbose = False
-for opt,arg in options:
+for opt, arg in options:
     if opt in ('-d', '--dataset'):
         datasetFilename = arg
     elif opt in ('-m', '--mapping'):
@@ -28,43 +28,35 @@ for opt,arg in options:
         print "\t--help: optional"
         sys.exit()
 
-
-'''
-Cargar todos los internal_id de dataset en una lista
-Recorrer linea por linea el mapping file
-	si el internal_id es el mismo
-		escribir linea en output
-'''
 startTime = time.time()
 
 cont = 0
 internal_ids = []
 with open(datasetFilename) as datasetFile:
-	dataRows = csv.DictReader(datasetFile)
-	for row in dataRows:
-		internal_ids.append(row['internal_id'])
-
+    dataRows = csv.DictReader(datasetFile)
+    for row in dataRows:
+        internal_ids.append(row['internal_id'])
 
 total = len(internal_ids)
 outputFile = codecs.open(outputFilename, "w", "iso-8859-1")
 firstLine = "internal_id,dblp_id \n"
 outputFile.write(firstLine)
 if verbose:
-	print firstLine.split('\n')[0]
+    print firstLine.split('\n')[0]
 
 with open(mappingFilename) as mappingFile:
-	mappingRows = csv.DictReader(mappingFile)
-	for mappingrow in mappingRows:
-		if cont>=total:
-			break
-		if mappingrow['internal_id'] in internal_ids:
-			outputLine = mappingrow['internal_id'] + "," + mappingrow['dblp_id '] + '\n'
-			outputFile.write(outputLine)
-			cont+=1
-			if verbose:
-				print outputLine.split('\n')[0]
+    mappingRows = csv.DictReader(mappingFile)
+    for mappingrow in mappingRows:
+        if cont >= total:
+            break
+        if mappingrow['internal_id'] in internal_ids:
+            outputLine = mappingrow['internal_id'] + "," + mappingrow['dblp_id '] + '\n'
+            outputFile.write(outputLine)
+            cont += 1
+            if verbose:
+                print outputLine.split('\n')[0]
 
 outputFile.close()
 
-print outputFilename,"generated in",int(time.time() - startTime),"seconds"
+print outputFilename, "generated in", int(time.time() - startTime), "seconds"
 

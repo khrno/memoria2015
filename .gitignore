@@ -1,3 +1,6 @@
+#Indexator
+indexator/nohup.out
+
 # DBLP
 dblpdataset/*.xml
 dblpdataset/*.gz

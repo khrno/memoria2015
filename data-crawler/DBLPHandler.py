@@ -49,8 +49,6 @@ class DBLPHandler(xml.sax.ContentHandler):
             dataIds = unidecode("p" + str(self.cont) + "," + self.paperKey + '\n')
             self.file.write(data)
             self.fileIds.write(dataIds)
-            if self.verbose and self.contTitles % 10000 == 0:
-                print "%d) %s" %(self.contTitles, self.article['title'])
             self.article['title'] = ""
             self.article['year'] = ""
 

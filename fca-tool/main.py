@@ -19,9 +19,10 @@ if ( __name__ == "__main__"):
     parserFlag = False
     latticeInput = None
     latticeOutput = None
+    latticefilename = None
 
-    options, remainder = getopt.getopt(sys.argv[1:], 'a:o:vhp',
-                                       ['attributes_filename=', 'objects_filename=', '--output_path=','verbose', 'help', 'parser', 'lattice_input', 'lattice_output'])
+    options, remainder = getopt.getopt(sys.argv[1:], 'a:o:l:vhp',
+                                       ['attributes_filename=', 'objects_filename=', 'output_path=', 'latticefilename=', 'verbose', 'help', 'parser', 'lattice_input', 'lattice_output'])
     for opt, arg in options:
         if opt in ('-p', '--parser'):
             parserFlag = True
@@ -40,6 +41,9 @@ if ( __name__ == "__main__"):
 
         elif opt in ('--output_path'):
             output_path = arg
+
+        elif opt in ('--latticefilename', '-l'):
+            latticefilename = arg
 
         elif opt in ('-v', '--verbose'):
             verbose = True
@@ -67,7 +71,7 @@ if ( __name__ == "__main__"):
         fc = FormalContext(attributes_filename, objects_filename, output_path=output_path, verbose=True)
         fc.load_data()
         fc.build_formal_context()
-        fc.exportToCoronSystem()
+        fc.exportToCoronSystem(latticeFilename = latticefilename)
         print "\t... execution total time:", int(time.time() - startTime), "seconds"
         print "[DONE]"
     else:

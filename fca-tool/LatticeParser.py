@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import getopt
+import sys
 import xml.sax
 import json
 
@@ -97,11 +99,18 @@ class LatticeParser(xml.sax.ContentHandler):
         if self.currentTag == "parents":
             self.parents = value.split(",")
 
+    def export(self, format, filename):
+        if format == "d3":
+            self.exportToD3(filename)
+        if format == "json":
+            self.export_to_json(filename)
+
     def export_to_json(self, json_filename):
         with open(json_filename, "w") as outputFile:
             outputFile.write(json.dumps(self.lattice))
+        print "Exported to json"
 
-    def test(self,filename):
+    def exportToD3(self, filename):
         nodes = []
         nodesMapping = {} # {conceptId: nodeId}
         links = []
@@ -115,20 +124,48 @@ class LatticeParser(xml.sax.ContentHandler):
 
         for concept in self.lattice:
             for parent in concept['parents']:
-                # print parent
+                print parent
+                if parent != '':
                 # print "{'source': %d, 'target': %d, 'value': 2})" % (nodesMapping[int(parent)], nodesMapping[int(concept['id'])])
-                links.append({'source': nodesMapping[int(parent)],'target':nodesMapping[int(concept['id'])], 'value': 2})
+                    links.append({'source': nodesMapping[int(parent)],'target':nodesMapping[int(concept['id'])], 'value': 2})
 
         with open(filename, "w") as dataFile:
             dataFile.write(json.dumps({'nodes': nodes, 'links': links}))
-        print "DUMPED"
+        print "Exported to D3"
 
 
 
-parser = xml.sax.make_parser()
-parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-Handler = LatticeParser()
-parser.setContentHandler(Handler)
-parser.parse("lattices/lattice.min100.xml")
-Handler.test('lattice.min100.d3.json')
-Handler.export_to_json('lattice.min100.json')
+
+if ( __name__ == "__main__"):
+    latticeInput = None
+    latticeOutput = None
+    formatTarget = "json"
+
+
+    options, remainder = getopt.getopt(sys.argv[1:], 'i:o:f:h',
+                                       ['lattice_input=', 'lattice_output=', 'format=', 'help'])
+    for opt, arg in options:
+        if opt in ('-i', '--lattice_input'):
+            latticeInput = arg
+
+        elif opt in ('-o', '--lattice_output'):
+            latticeOutput = arg
+
+        elif opt in ('-f', '--format'):
+            formatTarget = True
+
+        elif opt in ('-h', '--help'):
+            print "[HELP]"
+            print "Try using: python %s  with the following parameters" % sys.argv[0]
+            print "\t-i or --lattice_input <lattice_input>: required"
+            print "\t-o or --lattice_output <lattice_output>: required"
+            print "\t-f or --format <format>: optional by default json"
+            print "\t-h or --help: optional"
+            sys.exit()
+
+    parser = xml.sax.make_parser()
+    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
+    Handler = LatticeParser()
+    parser.setContentHandler(Handler)
+    parser.parse(latticeInput)
+    Handler.exportToD3(latticeOutput)
