@@ -10,6 +10,7 @@ Pendientes:
 		Check if paths exists
 
 	preprocessing
+		Filter by document-frequency (see undernote 1)
 		Generate output sliced by time lapse
 		Generate output sliced by type of publication
 		Generate output sliced by journal
@@ -30,3 +31,8 @@ Pendientes:
 	fca visualizer
 		[optional] lattice visualizer from sephirot output
 		[optional] lattice visualizer from coron output
+
+
+==============================================================================================================
+undernote 1
+	if a word is present in just one document, then that word isn't important to the collection of documents

@@ -3,14 +3,12 @@
 import xml.sax
 import sys  
 import codecs
-import getopt
-import time
 from unidecode import unidecode
 
 
 
 class DBLPHandler(xml.sax.ContentHandler):
-    def __init__(self, output_path, verbose = False):
+    def __init__(self, output_path, verbose=False):
         self.CurrentData = ""
         self.title =  ""
         self.paperKey = ""
@@ -19,8 +17,11 @@ class DBLPHandler(xml.sax.ContentHandler):
         output_data = output_path + "/DBLP.csv"
         output_ids = output_path + "/MapIdsToDBLP.csv"
         self.cont = 0
+        self.contTitles = 0
         self.file = codecs.open(output_data, "w", "iso-8859-1")
         self.fileIds = codecs.open(output_ids, "w", "iso-8859-1")
+        self.fileTitles = codecs.open(output_path + "/titles.txt", "w", "iso-8859-1")
+
         
         firstLineData = "internal_id,year,title \n"
         self.file.write(firstLineData)
@@ -31,28 +32,32 @@ class DBLPHandler(xml.sax.ContentHandler):
     def startElement(self, tag, attributes):
         self.CurrentData = tag
         self.cont+=1
-        if tag in  ("article", "inproceedings", "proceedings", "book", "incollection", "phdthesis","mastersthesis","www"):
+        if tag == "article":
             self.paperKey = attributes.get("key")
 
     def endElement(self, tag):
         if tag == "title":
             self.article['title'] = self.title
+            self.fileTitles.write(unidecode("%s\n" % self.title))
+            self.contTitles+=1
         if tag == "year":
             self.article['year'] = self.year
         
 
-        if len(self.article['title']) > 0 and len(self.article['year']) > 0 and int(self.article['year']) >= 1936:
+        if len(self.article['title']) > 0 and len(self.article['year']) > 0 and int(self.article['year']) >= 1970:
             data = unidecode("p" + str(self.cont) + "," + self.article['year'] + ',' + self.article['title'] + '\n')
             dataIds = unidecode("p" + str(self.cont) + "," + self.paperKey + '\n')
             self.file.write(data)
             self.fileIds.write(dataIds)
-            if self.verbose:
-                print data
             self.article['title'] = ""
             self.article['year'] = ""
+
         elif self.CurrentData == "dblp":
             self.file.close()
             self.fileIds.close()
+            self.fileTitles.close()
+            if self.verbose:
+                print "%d titles was written in %s" %(self.contTitles, self.output_path + "/titles.txt")
             sys.exit("stop")
 
     def characters(self, content):
@@ -65,26 +70,4 @@ class DBLPHandler(xml.sax.ContentHandler):
 
 
 
-if ( __name__ == "__main__"):
-    verbose = False
-    options, remainder = getopt.getopt(sys.argv[1:], 'i:o:v',['input=','output=','verbose','help'])
-    for opt,arg in options:
-        if opt in ('-i', '--input'):
-            input_filepath = arg
-        elif opt in ('-o', '--output'):
-            output_filepath = arg
-        elif opt in ('-v', '--verbose'):
-            verbose = True
-        elif opt in ('--help'):
-            print "[HELP] try using: python %s -i|--input <input_path> -o|--output <output_path> [help]" % sys.argv[0]
-            sys.exit()
 
-    starTime = time.time()
-
-    parser = xml.sax.make_parser()
-    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-    Handler = DBLPHandler(output_filepath, verbose)
-    parser.setContentHandler(Handler)
-    parser.parse(input_filepath)
-
-    print "Files DBLP.csv and MapIdsToDBLP.csv generated in",int(time.time() - starTime),"seconds"
