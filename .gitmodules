@@ -1,0 +1,3 @@
+[submodule "FCATool"]
+	path = FCATool
+	url = https://khrno@github.com/khrno/FCATool.git
