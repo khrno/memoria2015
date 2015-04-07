@@ -1,3 +1,11 @@
+#Tokenizer2
+Tokenizer2/Data/*.orig
+Tokenizer2/Data/*.csv
+Tokenizer2/Data/*.tmp
+Tokenizer2/Data/*.backup
+Tokenizer2/Data/output/*.csv
+Tokenizer2/Data/output/*.txt
+
 #Indexator
 indexator/nohup.out
 
