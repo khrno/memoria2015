@@ -16,10 +16,10 @@ dblpdataset/current_version
 dblpdataset/v*
 
 #FCA-Tool
-fca-tool/coron_contexts/*
-fca-tool/data/*
-fca-tool/lattices/*
-fca-tool/visualizer/d3data/*
+fca-tool.old/coron_contexts/*
+fca-tool.old/data/*
+fca-tool.old/lattices/*
+fca-tool.old/visualizer/d3data/*
 
 #Codekit
 *config.codekit
