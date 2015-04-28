@@ -1,3 +1,13 @@
+#MemoriaV2
+MemoriaV2/Dataset
+MemoriaV2/Tools/LDA-TMT/lda*
+MemoriaV2/Tools/LDA-TMT/dblp2.csv
+MemoriaV2/Tools/LDA-TMT/*.gz
+
+#CPP
+CPP/ajeo.context.rcf
+CPP/dblp.csv
+
 #Tokenizer2
 Tokenizer2/Data/*.orig
 Tokenizer2/Data/*.csv

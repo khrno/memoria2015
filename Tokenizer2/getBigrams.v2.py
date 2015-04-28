@@ -3,13 +3,21 @@ import time
 import csv
 from nltk.collocations import BigramCollocationFinder
 
-inputTokenFilename = 'Data/token.txt.tmp'
+inputTokenFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/tokens.cacm.txt'
 minimalBigramFreq = 40
-outputTokenFrequencyFilename = 'Data/output/token_frequency.csv'
-outputBigramFrequencyFilename = 'Data/output/bigram_frequency.csv'
-outputTokenFilename = 'Data/output/tokens.txt'
-outputBigramFilename = 'Data/output/bigrams.txt'
-outputTermsFilename = 'Data/output/terms.txt'
+outputTokenFrequencyFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/cacm.token_frequency.csv'
+outputBigramFrequencyFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/cacm.bigram_frequency.csv'
+outputTokenFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/cacm.tokens.txt'
+outputBigramFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/cacm.bigrams.txt'
+outputTermsFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cacm/cacm.terms.txt'
+
+# inputTokenFilename = 'Data/token.txt.tmp'
+# minimalBigramFreq = 40
+# outputTokenFrequencyFilename = 'Data/output/token_frequency.csv'
+# outputBigramFrequencyFilename = 'Data/output/bigram_frequency.csv'
+# outputTokenFilename = 'Data/output/tokens.txt'
+# outputBigramFilename = 'Data/output/bigrams.txt'
+# outputTermsFilename = 'Data/output/terms.txt'
 
 bigram_measures = nltk.collocations.BigramAssocMeasures()
 tokens = []

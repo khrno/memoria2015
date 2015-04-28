@@ -47,9 +47,12 @@ def save_tokens(filename, tokens):
             tokenFile.write("%s\n" % token)
 
 
-filename = 'Data/dblp.csv'
-tokenFilename = 'Data/token.txt.tmp'
-logFilename = "getTokens.runtime"
+# filename = 'Data/dblp.csv'
+filename = "/Users/pablo/Desktop/TryClassicDataset/src/data.cisi.csv"
+# tokenFilename = 'Data/token.txt.tmp'
+tokenFilename = '/Users/pablo/Desktop/TryClassicDataset/src/cisi/tokens.cisi.txt'
+# logFilename = "getTokens.runtime"
+logFilename = "/Users/pablo/Desktop/TryClassicDataset/src/cisi/getTokens.runtime.cisi.log"
 logging.basicConfig(filename=logFilename, level=logging.DEBUG)
 
 Nlimit = 200000
