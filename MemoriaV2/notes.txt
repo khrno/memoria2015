@@ -1,0 +1,3 @@
+Para ejecutar coron
+
+./core03_leco.sh dblp/newest/dblp.rcf 0.0900% -names -order -alg:dtouch -method:snow -ext -null -uc -l > dblp/newest/lattices/lattice.dblp.0.0900.ext.xml
