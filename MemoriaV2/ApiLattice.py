@@ -6,21 +6,63 @@ import ConfigParser
 import time
 import csv
 import os
+
+import numpy
+import nltk
+import string
+
 from ParserLattice import Lattice
 
 
 class ApiLattice():
-	def __init__(self, latticeFilename, documentFilename, verbose=False):
+	def __init__(self, latticeFilename, documentFilename, intentExtent=False, tokensPath=None, simmilarityFile=None, verbose=False):
 		self.latticeFilename = latticeFilename
 		self.documentFilename = documentFilename
 		self.verbose = verbose
 
 		if self.verbose:
 			print "\nReading Lattice"
-		self.lattice = Lattice(latticefilename=self.latticeFilename, verbose=self.verbose)
+
+		if intentExtent:
+			self.lattice = Lattice(latticefilename=self.latticeFilename, intentExtended=True, tokensPath = tokensPath, verbose=self.verbose)
+		else:
+			self.lattice = Lattice(latticefilename=self.latticeFilename, verbose=self.verbose)
+
+		if simmilarityFile:
+			self.loadSimilarity(simmilarityFile)
+		else:
+			self.topics = None
 
 		self.docs = []
 		self.loadDocs()
+
+	def loadSimilarity(self, simmilarityFilename):
+		if self.verbose:
+			print "Loading similarity jaccard"
+		topics = []
+		with open(simmilarityFilename, "rb") as simFile:
+			reader = csv.reader(simFile, delimiter=",")
+			reader.next() # skip header
+			for row in reader:
+				topicName = str(row[0])
+				conceptId = str(row[1])
+				simValue = float(row[2])
+				if topicName not in topics:
+					topics.append(topicName)
+
+				concept = self.getConceptById(int(conceptId))
+				if "topicDistribution" not in concept.keys():
+					concept["topicDistribution"] = []
+				
+				simTuple = (simValue, topicName)
+				concept["topicDistribution"].append(simTuple)
+		for concept in self.lattice.concepts:
+			if "topicDistribution" in concept.keys():
+				concept["topicDistribution"].sort(reverse=True)
+
+		self.topics = topics
+		if self.verbose:
+			print "\t%d topics loaded" % len(topics)
 
 	def loadDocs(self):
 		if self.verbose:
@@ -41,12 +83,20 @@ class ApiLattice():
 			if int(concept["id"]) == idConcept:
 				return concept
 		return None
+
+	def showLatticeMaxLevel(self):
+		maxlevel = -1
+		for concept in self.lattice.concepts:
+			if int(concept["level"]) > maxlevel:
+				maxlevel = int(concept["level"])
+		print maxlevel
+		raw_input("\n\t\tPress any key to continue...")
 	
 	def showConceptExtent(self):
 		i = 0
 		for extentIndex in self.concept["extent"]:
 			i += 1
-			dindex = self.lattice.getObjectById(extentIndex)
+			dindex = self.lattice.getoObjectById(extentIndex)
 			if dindex and len(dindex)>1:
 				dindex = dindex[1:]
 				try:
@@ -57,8 +107,8 @@ class ApiLattice():
 				dindex = dindex - 1
 				title = self.docs[dindex]
 				print "\t\t%d) %s" % (i, title)
-				if i%10 == 0:
-					raw_input("\n\t\tPress any key to continue...")
+				# if i%10 == 0:
+				# 	raw_input("\n\t\tPress any key to continue...")
 
 	def showConceptIntent(self):
 		i = 0
@@ -66,6 +116,14 @@ class ApiLattice():
 			i += 1
 			token = self.lattice.getAttributeById(intentIndex)
 			print "\t\t%d) %s" % (i, token)
+			if i%10 == 0:
+				raw_input("\n\t\tPress any key to continue...")
+
+	def showTopics(self):
+		i = 0
+		for topic in self.topics:
+			i += 1
+			print "\t\t%d) %s" % (i, topic)
 			if i%10 == 0:
 				raw_input("\n\t\tPress any key to continue...")
 
@@ -83,6 +141,13 @@ class ApiLattice():
 			print "\t6) Get the extent (press space each 10 elements)"
 			print "\t7) Get the intent (press space each 10 elements)"
 			print "\t8) Return to the main menu"
+			print "\t9) Get the max level of the lattice"
+			print "\t10) Seleccionar el top concept"
+			print "\t11) Seleccionar el bottom concept"
+			if self.topics and len(self.topics) > 0:
+				print "\t12) Get top 5 topics (jaccard simmilarity)"
+				print "\t13) Get topics (press space each 10 elements)"
+			print "\t14) Generate concept context"
 
 			print "\n\tIngrese su opcion:",
 			try:
@@ -106,8 +171,44 @@ class ApiLattice():
 				self.showConceptIntent()
 			elif option==8:
 				break
+			elif option==9:
+				self.showLatticeMaxLevel()
+			elif option==10:
+				self.concept = None
+				self.concept = self.getTopConcept()
+				self.showMenuExecuteAction()
+			elif option==11:
+				self.concept = None
+				self.concept = self.getBottomConcept()
+				self.showMenuExecuteAction()
+			elif option==12:
+				self.showTopTopcisOfConcept(5)
+			elif option==13:
+				self.showTopics()
+			elif option==14:
+				self.generateConceptContext()
 
 			raw_input("\n\tPress any key to continue...")
+	
+	def showTopTopcisOfConcept(self, k):
+		print "\t\t%d Topcis of Concept %d" % (k,int(self.concept["id"]))
+		print "\t\t+++++++++++++++++++++++++++++"
+		if self.concept["type"] == "inner":
+			for i in range(0,k):
+				print "\t\t%d) %s -> %f" % ((i+1),self.concept["topicDistribution"][i][1],self.concept["topicDistribution"][i][0])
+
+
+	def getTopConcept(self):
+		for concept in self.lattice.concepts:
+			if concept["type"] == "top":
+				return concept
+		return None
+
+	def getBottomConcept(self):
+		for concept in self.lattice.concepts:
+			if concept["type"] == "bottom":
+				return concept
+		return None
 
 	def menuGetConceptById(self, level=1):
 		idConcept = -1
@@ -126,6 +227,53 @@ class ApiLattice():
 				self.showMenuExecuteAction()
 			else:
 				print "Concept dont exist"
+	
+	def getObjectByExtentIndex(self, lookup):
+		dindex = self.lattice.getObjectById(lookup) # dindex have format d+indexdoc
+		if dindex and len(dindex)>1:
+			dindex = dindex[1:] # removing first letter 'd'
+			try:
+				dindex = int(dindex)
+			except ValueError:
+				print "[WARNING]",dindex,"is not integer. Passing through"
+				return None
+			dindex = dindex - 1
+			title = self.docs[dindex]
+			return title
+		else:
+			print "[WARNING]",dindex,"is not found or incorrect format. Passing through"
+			return None
+
+	def generateConceptContext(self, filename="context"):
+		if self.concept["type"] != "inner":
+			print "Concept type must be 'inner'"
+			return False
+
+		filename = "extent%d.txt" % self.concept["id"]
+		with open(filename,"w") as f:
+			for i in range(0,len(self.concept["extent"])):
+				index = self.concept["extent"][i]
+				f.write("%s\n" % index)
+			
+
+		
+			# for i in range(0,len(documentIndexes)):
+			# 	f.write("%d\n" % documentIndexes[i])
+		print "done"
+
+		# dimensions = (len(self.concept["extent"]), len(self.concept["intent"]))
+		# context = numpy.zeros(dimensions, dtype=numpy.int)
+		# for i in range(0,len(self.concept["extent"])):
+		# 	docTitle = self.getObjectByExtentIndex(self.concept["extent"][i])
+		# 	if docTitle != None:
+		# 		docTokens = nltk.wordpunct_tokenize(docTitle.lower().translate(None, string.punctuation))
+		# 		for j in range(0,len(self.concept["intent"])):
+		# 			token = self.lattice.getAttributeById(self.concept['intent'][j])
+		# 			if token in docTokens:
+		# 				context[i][j] = 1
+		# print context
+
+
 
 
 if ( __name__ == "__main__"):
@@ -146,16 +294,36 @@ if ( __name__ == "__main__"):
 
 	latticefilename = Config.get(sys.argv[0][:-3], "latticefilename")
 	documentfilename = Config.get(sys.argv[0][:-3], "documentfilename")
+	try:
+		intentextended = Config.getboolean(sys.argv[0][:-3],"intentextended")
+	except ConfigParser.NoOptionError:
+		intentextended = False
+
+	try:
+		tokenspath = Config.get(sys.argv[0][:-3], "tokenspath")
+	except ConfigParser.NoOptionError:
+		tokenspath = None
+
+	try:
+		simmilarityfile = Config.get(sys.argv[0][:-3], "simmilarityfile")
+	except ConfigParser.NoOptionError:
+		simmilarityfile = None
 
 	print "[START]"
 	print "Configuration:"
 	print "\tParameter latticefilename %s" % latticefilename
 	print "\tParameter documentfilename %s" % documentfilename
+	if intentextended:
+		print "\tParameter intentextended activated"
+	if tokenspath:
+		print "\tParameter tokenspath %s" % tokenspath
+	if simmilarityfile:
+		print "\tParameter simmilarityfile %s" % simmilarityfile
 
 	if args.timing:
 		t0 = time.time()
 
-	api = ApiLattice(latticefilename, documentfilename, verbose=args.verbose)
+	api = ApiLattice(latticefilename, documentfilename, intentExtent=intentextended, tokensPath=tokenspath, simmilarityFile=simmilarityfile, verbose=args.verbose)
 	api.menuGetConceptById()
 	
 	if args.timing:

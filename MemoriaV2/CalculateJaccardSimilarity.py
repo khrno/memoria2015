@@ -12,6 +12,8 @@ class JaccardSimilarity():
 		self.topics = []
 		self.loadTopicTerms()
 
+		self.similarityMap = self.calculateJaccardSimilarity()
+
 	def jaccard(self, a, b):
 		return float(len(set(a) & set(b))) / len(set(a) | set(b))
 
@@ -27,7 +29,66 @@ class JaccardSimilarity():
 		if self.verbose:
 			print "\t%d topics loaded" % len(self.topics)
 
+	def calculateJaccardSimilarity(self):
+		similarityMap = {}
+		if self.verbose:
+			print "\t calculate jaccard similarity"
+		for topic in self.topics:
+			for concept in self.lattice.concepts:
+				if concept["type"] == "inner":
+					intentAttr = []
+					for attrId in concept["intent"]:
+						intentAttr.append(self.lattice.getAttributeById(attrId))
+					simKey = (topic["topic"], concept["id"])
+					simValue = self.jaccard(topic["vocabulary"],intentAttr)
+					similarityMap[simKey] = simValue
+		return similarityMap
+
+	def exportSimilarities(self, outputfilename, outputPath=None):
+		if self.verbose:
+			print "\tExporting similarities"
+		
+		logfilename = outputfilename.split(".csv")[0] + ".log"
+		''' Writing stats file '''
+		if self.verbose:
+			print "\t\tExporting stats"
+		with open(logfilename, "w") as logFile:
+			''' Writing lattice stats in log file '''
+			logFile.write("Lattice Stats\n")
+			for k in self.lattice.stats.keys():
+				logFile.write("%s = %s\n" %(k, str(self.lattice.stats[k])))
+			''' Writing topic stats in log file '''
+			logFile.write("\nTopics Stats\n")
+			for topic in self.topics:
+				logFile.write("%s: %d terms\n" % (topic['topic'], len(topic['vocabulary'])))
+		
+		if outputPath == None:
+			outputPath = "%s/sims/" % "/".join(outputfilename.split("/")[:-1])
+
+		if self.verbose:
+			print "\t\tExporting values..."
+		with open(outputfilename, "w") as outputFile:
+			writer = csv.writer(outputFile, delimiter=",")
+			header = ["topic_name", "concept_id", "jaccard_simmilarity"]
+			writer.writerow(header)
+			for concept in self.lattice.concepts:
+				if concept["type"]=="inner":
+					simConceptFilename = "%ssims_%d.csv" % (outputPath,int(concept["id"]))
+					with open(simConceptFilename, "w") as simConceptFile:
+						writerConceptFile = csv.writer(simConceptFile, delimiter=",")
+						writerConceptFile.writerow(["topic_name","jaccard_simmilarity"])
+						for topic in self.topics:
+							simValue = self.similarityMap[(topic["topic"],concept["id"])]
+							writerConceptFile.writerow([topic["topic"],simValue])
+							writer.writerow([topic["topic"],concept["id"],simValue])
+
+
+
+
+
 	def calculateJaccardSimilarityBetweenIntentAndTopics(self, outputfilename):
+		print "[WARNING] calculateJaccardSimilarityBetweenIntentAndTopics was deprecated"
+		''' DEPRECATED '''
 		logfilename = outputfilename.split(".csv")[0] + ".log"
 		''' Writing lattice stats in log file '''
 		with open(logfilename, "w") as logFile:
@@ -73,20 +134,22 @@ if ( __name__ == "__main__"):
     topictermsfilename = Config.get(sys.argv[0][:-3], "topictermsfilename")
     latticefilename = Config.get(sys.argv[0][:-3], "latticefilename")
     topicconceptsimilarityfilename = Config.get(sys.argv[0][:-3], "topicconceptsimilarityfilename")
+    tokenspath = Config.get(sys.argv[0][:-3], "tokenspath")
 
     print "[START]"
     print "Parameter topictermsfilename %s" % topictermsfilename
     print "Parameter latticefilename %s" % latticefilename 
     print "Parameter topicconceptsimilarityfilename %s" % topicconceptsimilarityfilename
+    print "Parameter tokenspath %s" % tokenspath
     
     
 
     if args.timing:
         t0 = time.time()
 
-    lattice = Lattice(latticefilename, args.verbose)
+    lattice = Lattice(latticefilename, intentExtended=True, tokensPath = tokenspath,verbose=args.verbose)
     jaccard = JaccardSimilarity(lattice, topictermsfilename, args.verbose)
-    jaccard.calculateJaccardSimilarityBetweenIntentAndTopics(topicconceptsimilarityfilename)
+    jaccard.exportSimilarities(topicconceptsimilarityfilename)
 
     if args.timing:
         t1 = time.time()

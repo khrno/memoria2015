@@ -87,7 +87,7 @@ class LatticeHandler(xml.sax.ContentHandler):
 		if self.verbose and tag == "attributes":
 			print "\t\t[DONE]"
 		if self.verbose and tag == "concepts":
-			print "\t\t[DONE]\n"
+			print "\t\t[DONE]"
 
 
 	def characters(self, content):

@@ -5,12 +5,14 @@ import sys
 import argparse
 import ConfigParser
 import time
+import csv
 from nltk.corpus import stopwords
 
 class IntentExtendator():
-	def __init__(self, conceptDirectory, tokenDirectory, concept_log_filename="log.txt", verbose=False):
+	def __init__(self, conceptDirectory, tokenDirectory, tokenFrequencyDirectory, concept_log_filename="log.txt", verbose=False):
 		self.conceptDirectory = conceptDirectory
 		self.tokenDirectory = tokenDirectory
+		self.tokenFrequencyDirectory = tokenFrequencyDirectory
 		self.concept_log_filename = concept_log_filename
 		self.verbose = verbose
 
@@ -101,7 +103,7 @@ class IntentExtendator():
 
 	def applyHandCraftStopwords(self, tokens, stopwordsfilename="stopwords.txt"):
 		if self.verbose:
-			print "\t\tApplying handcrafted stopword list: %s", stopwordsfilename
+			print "\t\tApplying handcrafted stopword list:", stopwordsfilename,
 		sstopwords = []
 		with open(stopwordsfilename, "r") as swf:
 			for word in swf:
@@ -139,7 +141,21 @@ class IntentExtendator():
 				frequency = t[1]
 				tokenFile.write("%s\n" % token)
 		if self.verbose:
-			print "\t\tTop %d Tokens written in %s" % (k,tokensFilename)
+			print "\t\tTop %d Tokens written in %s" % (k,os.path.join(self.tokenDirectory, tokensFilename))
+
+	def writeMostCommonTokensWithFrequency(self, tokens, conceptFilename, k = 50):
+		concept_id = self.getConceptIdFromConceptFilename(conceptFilename)
+		tokensFilename = "tf_%d.txt" % concept_id
+		fd = nltk.FreqDist(tokens)
+		with open(os.path.join(self.tokenFrequencyDirectory, tokensFilename), "w") as tokenFile:
+			writer = csv.writer(tokenFile, delimiter=",")
+			writer.writerow(['token','frequency'])
+			for t in fd.most_common(k):
+				token = t[0]
+				frequency = t[1]
+				writer.writerow([token, frequency])
+		if self.verbose:
+			print "\t\tTop %d Tokens-Frequency written in %s" % (k,os.path.join(self.tokenFrequencyDirectory, tokensFilename))
 
 	def getTokens(self, breaklimit = None):
 		qty = 0
@@ -157,6 +173,7 @@ class IntentExtendator():
 			if self.verbose:
 				print "\tWriting tokens in %s" % self.tokenDirectory
 			self.writeMostCommonTokens(tokens,conceptFilename)
+			self.writeMostCommonTokensWithFrequency(tokens, conceptFilename)
 
 			self.logConcept(self.getConceptIdFromConceptFilename(conceptFilename))
 			qty += 1
@@ -197,6 +214,7 @@ if ( __name__ == "__main__"):
 
 	conceptdirectory = Config.get(sys.argv[0][:-3], "conceptdirectory")
 	tokendirectory = Config.get(sys.argv[0][:-3], "tokendirectory")
+	tokenfrequencydirectory =  Config.get(sys.argv[0][:-3], "tokenfrequencydirectory")
 	conceptlogfilename = Config.get(sys.argv[0][:-3], "conceptlogfilename")
 	breaklimit = Config.get(sys.argv[0][:-3], "breaklimit")
 	
@@ -206,13 +224,14 @@ if ( __name__ == "__main__"):
 	print "Configuration:"
 	print "\tParameter conceptdirectory %s" % conceptdirectory
 	print "\tParameter tokendirectory %s" % tokendirectory
+	print "\tParameter tokenfrequencydirectory %s" % tokenfrequencydirectory
 	print "\tParameter conceptlogfilename %s" % conceptlogfilename
 	print "\tParameter breaklimit %d" % breaklimit
 
 	if args.timing:
 		t0 = time.time()
 
-	extendator = IntentExtendator(conceptdirectory, tokendirectory, concept_log_filename=conceptlogfilename, verbose=args.verbose)
+	extendator = IntentExtendator(conceptdirectory, tokendirectory, tokenfrequencydirectory, concept_log_filename=conceptlogfilename, verbose=args.verbose)
 	extendator.getTokens(breaklimit)
 	# extendator.generateStopwordListByTopKGlobalFrequencyDistribution("stopwords.txt", 5)
 

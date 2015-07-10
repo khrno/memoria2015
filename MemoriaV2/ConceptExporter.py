@@ -9,6 +9,7 @@ import os
 from ParserLattice import Lattice
 import csv
 
+import linecache
 
 class ConceptExporter():
 	def __init__(self, lattice, docsfilename, concept_log_filename="log.txt", 
@@ -24,8 +25,8 @@ class ConceptExporter():
 
 		self.logged = self.loadConceptLog()
 
-		self.docs = []
-		self.loadDocs()
+		# self.docs = []
+		# # self.loadDocs()
 	
 	def is_valid_token(self, token):
 		tagged = dict(nltk.pos_tag([token]))
@@ -60,9 +61,16 @@ class ConceptExporter():
 		return None
 
 	def logConcept(self, id_concept):
+		if self.logged == None:
+			self.logged = []
+		
 		with open(self.concept_log_filename, "a") as logFile:
 			logFile.write("\n%d" % id_concept)
 			self.logged.append(id_concept)
+		# else:
+		# 	with open(self.concept_log_filename, "w") as logFile:
+		# 		logFile.write("\n%d" % id_concept)
+		# 		self.logged.append(id_concept)
 
 
 	def loadDocs(self):
@@ -82,20 +90,24 @@ class ConceptExporter():
 	def exportConcepts(self, path):
 		if self.verbose:
 			print "Exporting concepts"
+			raw_input("Press any key to start")
 		qty = 0
 		for concept in self.lattice.concepts:
-			if concept["type"] == "inner"  and (self.logged and len(self.logged)>0 and int(concept["id"]) not in self.logged):
+			if concept["type"] == "inner" and (self.logged == None or (self.logged and len(self.logged)>0 and int(concept["id"]) not in self.logged)):
 			# if concept["type"] == "inner":
 				text = ''
 				filename = "%s/c_%d.txt" % (path, int(concept["id"]))
 				i = 0
 				if self.verbose and (qty == 0 or qty % self.qtyVerboseConcept == 0):
-					print "\tProcesing concept %d of %d. Will be write in %s" % ((qty+1), (len(self.lattice.concepts)-2), filename)
+					qtyLogged = 0
+					if self.logged:
+						qtyLogged = len(self.logged)
+					print "\tProcesing concept %d of %d. Will be write in %s" % ((qty+1), (len(self.lattice.concepts)-2-qtyLogged), filename)
 				for extentIndex in concept["extent"]:
 					i += 1
-					if self.verbose and i % self.qtyVerboseExtent == 0:
-						print "\t\tdoc %d of %d" % (i, len(concept["extent"]))
-					dindex = self.lattice.getObjectById(extentIndex)
+					# if self.verbose and i % self.qtyVerboseExtent == 0:
+						# print "\t\tdoc %d of %d" % (i, len(concept["extent"]))
+					dindex = self.lattice.getoObjectById(extentIndex)
 					if dindex and len(dindex)>1:
 						dindex = dindex[1:]
 						try:
@@ -103,9 +115,19 @@ class ConceptExporter():
 						except ValueError:
 							print dindex, " could not be integer, passing to next" 
 							pass
-						dindex = dindex - 1
-						title = self.docs[dindex]
-						text += " " + title
+
+						line = linecache.getline(self.docsFilename, dindex)
+						lineOriginal = line
+						line = line.split(",")
+						try:
+							line = line[1]
+							line = line.rsplit("\n")[0]
+							text += " " + line
+						except IndexError:
+							print "WARNING in concept %d, extent '%s' > index error" % (int(concept["id"]), lineOriginal)
+							pass
+						# title = self.docs[dindex]
+						# text += " " + title
 				
 				with open(filename,"w") as conceptFile:
 					conceptFile.write(text)
@@ -154,7 +176,7 @@ if ( __name__ == "__main__"):
 	print "\tParameter conceptlogfilename %s" % conceptlogfilename
 	print "\tParameter qtyVerboseConcept %d" % qtyVerboseConcept
 	print "\tParameter qtyVerboseExtent %d" % qtyVerboseExtent
-	print "\tParameter cocneptLimit %d" % conceptLimit
+	print "\tParameter conceptLimit %d" % conceptLimit
 
 	if args.timing:
 		t0 = time.time()
